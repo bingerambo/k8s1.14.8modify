@@ -304,7 +304,8 @@ func (s *Server) InstallDefaultHandlers() {
 		cadvisormetrics.DiskIOMetrics:           struct{}{},
 		cadvisormetrics.DiskUsageMetrics:        struct{}{},
 		cadvisormetrics.NetworkUsageMetrics:     struct{}{},
-		cadvisormetrics.AcceleratorUsageMetrics: struct{}{},
+		// disable Accelerator Metrics, e.g. GPU, modify by wangb
+		//cadvisormetrics.AcceleratorUsageMetrics: struct{}{},
 		cadvisormetrics.AppMetrics:              struct{}{},
 	}
 	r.MustRegister(metrics.NewPrometheusCollector(prometheusHostAdapter{s.host}, containerPrometheusLabelsFunc(s.host), includedMetrics))

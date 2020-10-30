@@ -79,7 +79,8 @@ func New(imageFsInfoProvider ImageFsInfoProvider, rootPath string, usingLegacySt
 		cadvisormetrics.CpuLoadMetrics:          struct{}{},
 		cadvisormetrics.DiskIOMetrics:           struct{}{},
 		cadvisormetrics.NetworkUsageMetrics:     struct{}{},
-		cadvisormetrics.AcceleratorUsageMetrics: struct{}{},
+		// disable Accelerator Metrics, e.g. GPU, modify by wangb
+		//cadvisormetrics.AcceleratorUsageMetrics: struct{}{},
 		cadvisormetrics.AppMetrics:              struct{}{},
 	}
 	if usingLegacyStats {

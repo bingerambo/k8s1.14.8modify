@@ -205,21 +205,22 @@ func New(memoryCache *memory.InMemoryCache, sysfs sysfs.SysFs, maxHousekeepingIn
 	eventsChannel := make(chan watcher.ContainerEvent, 16)
 
 	newManager := &manager{
-		containers:                            make(map[namespacedContainerName]*containerData),
-		quitChannels:                          make([]chan error, 0, 2),
-		memoryCache:                           memoryCache,
-		fsInfo:                                fsInfo,
-		sysFs:                                 sysfs,
-		cadvisorContainer:                     selfContainer,
-		inHostNamespace:                       inHostNamespace,
-		startupTime:                           time.Now(),
-		maxHousekeepingInterval:               maxHousekeepingInterval,
-		allowDynamicHousekeeping:              allowDynamicHousekeeping,
-		includedMetrics:                       includedMetricsSet,
-		containerWatchers:                     []watcher.ContainerWatcher{},
-		eventsChannel:                         eventsChannel,
-		collectorHttpClient:                   collectorHttpClient,
-		nvidiaManager:                         &accelerators.NvidiaManager{},
+		containers:               make(map[namespacedContainerName]*containerData),
+		quitChannels:             make([]chan error, 0, 2),
+		memoryCache:              memoryCache,
+		fsInfo:                   fsInfo,
+		sysFs:                    sysfs,
+		cadvisorContainer:        selfContainer,
+		inHostNamespace:          inHostNamespace,
+		startupTime:              time.Now(),
+		maxHousekeepingInterval:  maxHousekeepingInterval,
+		allowDynamicHousekeeping: allowDynamicHousekeeping,
+		includedMetrics:          includedMetricsSet,
+		containerWatchers:        []watcher.ContainerWatcher{},
+		eventsChannel:            eventsChannel,
+		collectorHttpClient:      collectorHttpClient,
+		// disable gpu collect modify by wangb
+		//nvidiaManager:                         &accelerators.NvidiaManager{},
 		rawContainerCgroupPathPrefixWhiteList: rawContainerCgroupPathPrefixWhiteList,
 	}
 
@@ -359,7 +360,8 @@ func (self *manager) Start() error {
 	}
 
 	// Setup collection of nvidia GPU metrics if any of them are attached to the machine.
-	self.nvidiaManager.Setup()
+	// disable gpu collect modify by wangb
+	//self.nvidiaManager.Setup()
 
 	// Create root and then recover all containers.
 	err = self.createContainer("/", watcher.Raw)
@@ -394,7 +396,8 @@ func (self *manager) Start() error {
 }
 
 func (self *manager) Stop() error {
-	defer self.nvidiaManager.Destroy()
+	// disable gpu collect modify by wangb
+	//defer self.nvidiaManager.Destroy()
 	// Stop and wait on all quit channels.
 	for i, c := range self.quitChannels {
 		// Send the exit signal and wait on the thread to exit (by closing the channel).
@@ -1019,7 +1022,10 @@ func (m *manager) createContainerLocked(containerName string, watchSource watche
 	if err != nil {
 		klog.Warningf("Error getting devices cgroup path: %v", err)
 	} else {
-		cont.nvidiaCollector, err = m.nvidiaManager.GetCollector(devicesCgroupPath)
+		// disable gpu collect modify by wangb
+		//cont.nvidiaCollector, err = m.nvidiaManager.GetCollector(devicesCgroupPath)
+		_ = devicesCgroupPath
+		cont.nvidiaCollector, err = nil, nil
 		if err != nil {
 			klog.V(4).Infof("GPU metrics may be unavailable/incomplete for container %q: %v", cont.info.Name, err)
 		}
